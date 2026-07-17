@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.cache/
+.npm/
+.DS_Store
+.idea/
+.vscode/
+*.AppImage
+*.log
+npm-debug.log*
+arch-pkg/pkg/
+arch-pkg/src/
+arch-pkg/*.pkg.tar.*

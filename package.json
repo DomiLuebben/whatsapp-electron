@@ -1,0 +1,85 @@
+{
+  "name": "whatsapp-electron",
+  "productName": "WhatsApp",
+  "version": "1.1.0",
+  "description": "Unofficial WhatsApp Web desktop wrapper for Linux with voice and video calls",
+  "author": "Dominik Lübben",
+  "private": true,
+  "main": "src/main.js",
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/DomiLuebben/whatsapp-electron#readme",
+  "bugs": {
+    "url": "https://github.com/DomiLuebben/whatsapp-electron/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DomiLuebben/whatsapp-electron.git"
+  },
+  "engines": {
+    "node": ">=22.12 <26"
+  },
+  "scripts": {
+    "check:node": "node scripts/check-node.js",
+    "prestart": "npm run check:node",
+    "start": "electron .",
+    "test": "node --test",
+    "prebuild": "npm run check:node",
+    "build": "electron-builder --linux AppImage --publish never",
+    "prebuild:dir": "npm run check:node",
+    "build:dir": "electron-builder --linux dir --publish never"
+  },
+  "devDependencies": {
+    "electron": "^43.1.1",
+    "electron-builder": "^26.11.1"
+  },
+  "build": {
+    "appId": "com.dluebben.whatsapp-desktop",
+    "productName": "WhatsApp",
+    "asar": true,
+    "compression": "maximum",
+    "electronFuses": {
+      "runAsNode": false,
+      "enableNodeOptionsEnvironmentVariable": false,
+      "enableNodeCliInspectArguments": false,
+      "onlyLoadAppFromAsar": true,
+      "grantFileProtocolExtraPrivileges": false
+    },
+    "electronLanguages": [
+      "de",
+      "en-US"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Network;InstantMessaging;",
+      "icon": "build/icon.png",
+      "synopsis": "WhatsApp Web Desktop",
+      "description": "Unofficial WhatsApp Web desktop wrapper with tray integration, native notifications, and voice/video calls.",
+      "executableName": "whatsapp",
+      "desktop": {
+        "entry": {
+          "Name": "WhatsApp",
+          "Comment": "WhatsApp Web Desktop",
+          "StartupWMClass": "WhatsApp"
+        }
+      }
+    },
+    "appImage": {
+      "artifactName": "WhatsApp-${version}-x86_64.AppImage"
+    }
+  }
+}

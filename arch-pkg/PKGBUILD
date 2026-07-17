@@ -1,0 +1,63 @@
+# Maintainer: Dominik Lübben <dominikluebben@googlemail.com>
+pkgname=whatsapp-electron
+pkgver=1.1.0
+pkgrel=1
+pkgdesc="Electron wrapper for WhatsApp Web with tray, notifications, and calls"
+arch=('x86_64')
+url="https://github.com/DomiLuebben/whatsapp-electron"
+license=('GPL-2.0-or-later')
+# linux-unpacked contains the bundled Electron binaries. These are the system
+# libraries against which the bundled Chromium build links dynamically.
+depends=(
+    'alsa-lib' 'at-spi2-core' 'cairo' 'cups' 'dbus' 'expat'
+    'gcc-libs' 'glib2' 'glibc' 'gtk3' 'libcups' 'libdrm'
+    'libnotify' 'libsecret' 'libxcomposite' 'libxdamage' 'libxkbcommon'
+    'libxrandr' 'libxss' 'libxtst' 'mesa' 'nspr' 'nss' 'pango'
+    'ttf-liberation' 'xdg-utils'
+)
+optdepends=(
+    'libayatana-appindicator: tray icon on GNOME/KDE'
+    'pipewire: screen sharing during calls'
+)
+provides=('whatsapp')
+conflicts=('whatsapp-nativefier' 'whatsapp-for-linux' 'whatsapp')
+options=('!strip' '!debug' 'emptydirs')
+
+# Source: the electron-builder directory output next to this PKGBUILD.
+source=(
+    'whatsapp-electron.desktop'
+    'whatsapp.sh'
+)
+sha256sums=('SKIP' 'SKIP')
+
+package() {
+    local _src="${startdir}/../dist/linux-unpacked"
+    if [[ ! -d "${_src}" ]]; then
+        echo "ERROR: ${_src} is missing; run 'npm run build:dir' first." >&2
+        return 1
+    fi
+
+    # Application tree under /opt/whatsapp-electron.
+    install -dm755 "${pkgdir}/opt/whatsapp-electron"
+    # Let fakeroot assign package ownership instead of preserving source UIDs.
+    cp -a --no-preserve=ownership "${_src}/." "${pkgdir}/opt/whatsapp-electron/"
+
+    # chrome-sandbox needs setuid root when unprivileged user namespaces are
+    # unavailable.
+    chmod 4755 "${pkgdir}/opt/whatsapp-electron/chrome-sandbox"
+
+    # Launcher wrapper.
+    install -Dm755 "${srcdir}/whatsapp.sh" "${pkgdir}/usr/bin/whatsapp"
+
+    # Desktop entry.
+    install -Dm644 "${srcdir}/whatsapp-electron.desktop" \
+        "${pkgdir}/usr/share/applications/whatsapp-electron.desktop"
+
+    # Install the 512 px icon into the hicolor theme.
+    install -Dm644 "${startdir}/../src/icon.png" \
+        "${pkgdir}/usr/share/icons/hicolor/512x512/apps/whatsapp-electron.png"
+
+    # Preserve Electron's bundled license.
+    install -Dm644 "${_src}/LICENSE.electron.txt" \
+        "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE.electron.txt"
+}
