@@ -9,24 +9,40 @@ badges, and working voice and video call controls.
 > or Meta. WhatsApp is a trademark of Meta Platforms, Inc.
 
 > [!NOTE]
-> This is a **Linux-only** desktop application. The downloadable binary package
-> currently targets Arch Linux on x86_64. Debian, Ubuntu, and Fedora users can
-> build the AppImage from the same source; no Windows or macOS packages are
-> provided.
+> This is a **Linux-only** desktop application. Native Arch Linux, Debian/Ubuntu,
+> and Fedora packages are provided for x86_64, together with a portable
+> AppImage. No Windows or macOS packages are provided.
 
 ## Downloads
 
-The Linux 1.1.0 release provides:
+The Linux 1.1.1 release provides:
 
-- [Arch Linux x86_64 package](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.0/whatsapp-electron-1.1.0-1-x86_64.pkg.tar.zst)
-- [Source code archive](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.0/whatsapp-electron-1.1.0-source.tar.gz)
-- [SHA-256 checksums](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.0/SHA256SUMS)
-- [All files and release notes](https://github.com/DomiLuebben/whatsapp-electron/releases/tag/v1.1.0)
+- [Debian/Ubuntu amd64 package](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.1/whatsapp-electron-1.1.1-amd64.deb)
+- [Fedora x86_64 RPM package](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.1/whatsapp-electron-1.1.1-x86_64.rpm)
+- [Arch Linux x86_64 package](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.1/whatsapp-electron-1.1.1-1-x86_64.pkg.tar.zst)
+- [Portable x86_64 AppImage](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.1/WhatsApp-1.1.1-x86_64.AppImage)
+- [Source code archive](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.1/whatsapp-electron-1.1.1-source.tar.gz)
+- [SHA-256 checksums](https://github.com/DomiLuebben/whatsapp-electron/releases/download/v1.1.1/SHA256SUMS)
+- [All files and release notes](https://github.com/DomiLuebben/whatsapp-electron/releases/tag/v1.1.1)
 
-Install the downloaded Arch package with:
+Install the native package for your distribution with one of these commands:
 
 ```bash
-sudo pacman -U ./whatsapp-electron-1.1.0-1-x86_64.pkg.tar.zst
+# Debian or Ubuntu
+sudo apt install ./whatsapp-electron-1.1.1-amd64.deb
+
+# Fedora
+sudo dnf install ./whatsapp-electron-1.1.1-x86_64.rpm
+
+# Arch Linux
+sudo pacman -U ./whatsapp-electron-1.1.1-1-x86_64.pkg.tar.zst
+```
+
+The AppImage needs no installation:
+
+```bash
+chmod +x ./WhatsApp-1.1.1-x86_64.AppImage
+./WhatsApp-1.1.1-x86_64.AppImage
 ```
 
 ## Why voice and video calls work
@@ -99,17 +115,17 @@ cd arch-pkg
 makepkg -sfc
 ```
 
-The finished package is written to
-`arch-pkg/whatsapp-electron-1.1.0-1-x86_64.pkg.tar.zst`. Install it with
+The finished native Arch package is written to
+`arch-pkg/whatsapp-electron-1.1.1-1-x86_64.pkg.tar.zst`. Install it with
 `sudo pacman -U` as shown in the download section.
 
 ## Build on Debian or Ubuntu
 
-These steps produce an AppImage rather than a native `.deb` package:
+These steps build a native `.deb` package:
 
 ```bash
 sudo apt update
-sudo apt install build-essential git
+sudo apt install build-essential git xz-utils
 
 git clone https://github.com/DomiLuebben/whatsapp-electron.git
 cd whatsapp-electron
@@ -117,15 +133,19 @@ nvm install 24
 nvm use 24
 npm ci
 npm test
-npm run build
+npm run build:deb
 ```
+
+The package is written to `dist/whatsapp-electron-1.1.1-amd64.deb`. Install it
+with `sudo apt install ./dist/whatsapp-electron-1.1.1-amd64.deb`.
 
 ## Build on Fedora
 
-These steps produce the same Linux AppImage:
+These steps build a native `.rpm` package. `rpm-build` provides the `rpmbuild`
+tool required by the RPM target:
 
 ```bash
-sudo dnf install gcc-c++ make git
+sudo dnf install gcc-c++ make git rpm-build
 
 git clone https://github.com/DomiLuebben/whatsapp-electron.git
 cd whatsapp-electron
@@ -133,20 +153,41 @@ nvm install 24
 nvm use 24
 npm ci
 npm test
+npm run build:rpm
+```
+
+The package is written to `dist/whatsapp-electron-1.1.1-x86_64.rpm`. Install it
+with `sudo dnf install ./dist/whatsapp-electron-1.1.1-x86_64.rpm`.
+
+## Build the portable AppImage
+
+After installing the build tools for your distribution and selecting Node.js
+24, run:
+
+```bash
+npm ci
+npm test
 npm run build
 ```
 
-On Debian, Ubuntu, and Fedora, the resulting file is written to:
+The resulting portable file is written to:
 
 ```text
-dist/WhatsApp-1.1.0-x86_64.AppImage
+dist/WhatsApp-1.1.1-x86_64.AppImage
 ```
 
 Make it executable and start it with:
 
 ```bash
-chmod +x dist/WhatsApp-1.1.0-x86_64.AppImage
-./dist/WhatsApp-1.1.0-x86_64.AppImage
+chmod +x dist/WhatsApp-1.1.1-x86_64.AppImage
+./dist/WhatsApp-1.1.1-x86_64.AppImage
+```
+
+On a Linux build host that also has `rpmbuild`, all three electron-builder
+formats can be produced in one pass:
+
+```bash
+npm run build:linux
 ```
 
 ## Run from source
